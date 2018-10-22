@@ -4,7 +4,7 @@ from flask_migrate import Migrate
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URL'] = 'mysql://root:root@1234@localhost/flask'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@localhost/flask'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
@@ -14,7 +14,6 @@ class User(db.Model):
     name = db.Column(db.String(64), nullable=False)
     phone_number = db.Column(db.Integer,  unique=True)
     email = db.Column(db.String(128))
-
     message = db.Column(db.String(500), nullable=False)
 
 
