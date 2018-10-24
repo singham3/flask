@@ -1,20 +1,23 @@
 from flask import Flask,render_template, request
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+import pymysql.cursors
+
+
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@localhost/flask'
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+connection = pymysql.connect(host='localhost',
+                             user='root',
+                             password='root',
+                             db='flask',
+                             charset='utf8mb4',
+                             cursorclass=pymysql.cursors.DictCursor)
 
 
-class User(db.Model):
-    Sno = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), nullable=False)
-    phone_number = db.Column(db.Integer,  unique=True)
-    email = db.Column(db.String(128))
-    message = db.Column(db.String(500), nullable=False)
+
+
+
+
+
 
 
 
@@ -28,15 +31,19 @@ def about():
 
 @app.route('/contact', methods = ['GET', 'POST'])
 def contact():
-    if request.method =='POST':
+    if request.method == 'POST':
         name = request.form.get('name')
-        phone = request.form.get('phone')
+        phone_number = request.form.get('phone_number')
         email = request.form.get('email')
         message = request.form.get('message')
-        entry = contact(name=name, phone_number=phone, email=email, message=message)
-        db.session.add(entry)
-        db.session.commit()
+        connection = pymysql.connect(host='localhost', user='root', password='root', db='flask')
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT INTO contact ( name, phone_number,email, message) VALUES ( name, phone_number,email,message);")
+            connection.commit()
+        print(name,phone_number,email,message)
     return render_template('contact.html')
+
+
 
 @app.route('/404')
 def _404():
